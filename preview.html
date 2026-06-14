@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐺 狼人杀 - 在线多人游戏预览</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #2d1b69 50%, #1e1b4b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(168, 85, 247, 0.8);
+            }
+        }
+
+        .animate-slide-in {
+            animation: slideIn 0.8s ease-out;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .glow-effect {
+            animation: pulse-glow 2s infinite;
+        }
+
+        .card {
+            background: rgba(30, 27, 75, 0.8);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(168, 85, 247, 0.6);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.4);
+        }
+
+        .input-field {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: rgba(168, 85, 247, 0.8);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .role-werewolf {
+            background: rgba(220, 38, 38, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(220, 38, 38, 0.5);
+        }
+
+        .role-villager {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+            border: 1px solid rgba(34, 197, 94, 0.5);
+        }
+
+        .role-seer {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.5);
+        }
+
+        .role-doctor {
+            background: rgba(168, 85, 247, 0.2);
+            color: #d8b4fe;
+            border: 1px solid rgba(168, 85, 247, 0.5);
+        }
+
+        .role-hunter {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, 0.5);
+        }
+
+        header {
+            background: linear-gradient(to right, #0f172a, #2d1b69);
+            border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+            padding: 20px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #cbd5e1;
+            margin-bottom: 40px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 60px auto;
+            max-width: 1200px;
+            padding: 0 20px;
+        }
+
+        .feature-card {
+            background: rgba(30, 27, 75, 0.6);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(168, 85, 247, 0.6);
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .screenshots {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 0 20px;
+        }
+
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .screenshot-item {
+            background: rgba(30, 27, 75, 0.8);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .screenshot-item:hover {
+            transform: scale(1.05);
+            border-color: rgba(168, 85, 247, 0.8);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
+        }
+
+        .mock-screen {
+            background: linear-gradient(135deg, #1e1b4b, #2d1b69);
+            padding: 24px;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .roles-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .role-card {
+            background: rgba(30, 27, 75, 0.9);
+            border: 2px solid rgba(168, 85, 247, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .role-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(168, 85, 247, 0.8);
+            box-shadow: 0 15px 40px rgba(168, 85, 247, 0.2);
+        }
+
+        .role-avatar {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            border: 2px solid rgba(168, 85, 247, 0.5);
+        }
+
+        footer {
+            background: linear-gradient(to right, #0f172a, #2d1b69);
+            border-top: 1px solid rgba(168, 85, 247, 0.2);
+            padding: 40px 20px;
+            text-align: center;
+            color: #cbd5e1;
+            margin-top: 80px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span style="font-size: 2rem;">🐺</span>
+                <h1 style="font-size: 1.5rem; font-weight: 700; color: #a855f7;">狼人杀</h1>
+            </div>
+            <div class="flex gap-4">
+                <button class="btn-primary">登录</button>
+                <button class="btn-primary">注册</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero 部分 -->
+    <section class="hero animate-fade-in">
+        <h1>🐺 狼人杀游戏</h1>
+        <p>精美的在线多人策略推理游戏</p>
+        <p style="font-size: 1rem; color: #94a3b8; margin-bottom: 50px;">采用日式二次元美学设计 | 实时WebSocket通信 | 完整游戏逻辑</p>
+        <button class="btn-primary" style="font-size: 1.1rem; padding: 15px 40px;">立即开始游戏</button>
+    </section>
+
+    <!-- 功能特性 -->
+    <section class="features-grid animate-slide-in">
+        <div class="feature-card">
+            <div class="feature-icon">👥</div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 10px;">多人游戏</h3>
+            <p style="color: #cbd5e1;">4-20人实时对战，支持房间创建和加入</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 10px;">二次元风格</h3>
+            <p style="color: #cbd5e1;">精美的日式美学UI设计，沉浸式游戏体验</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 10px;">实时通信</h3>
+            <p style="color: #cbd5e1;">WebSocket实时聊天和游戏状态同步</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🎮</div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 10px;">完整玩法</h3>
+            <p style="color: #cbd5e1;">白天投票、夜晚技能、自动角色分配</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 10px;">数据统计</h3>
+            <p style="color: #cbd5e1;">排行榜、游戏历史、个人统计数据</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 10px;">安全认证</h3>
+            <p style="color: #cbd5e1;">JWT加密认证、密码安全存储</p>
+        </div>
+    </section>
+
+    <!-- 角色展示 -->
+    <section style="max-width: 1200px; margin: 80px auto; padding: 0 20px;">
+        <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 50px;">
+            <span style="background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">游戏角色</span>
+        </h2>
+        <div class="roles-showcase">
+            <!-- 狼人 -->
+            <div class="role-card">
+                <div class="role-avatar" style="background: rgba(220, 38, 38, 0.2); border-color: #dc2626;">🐺</div>
+                <h3 style="font-weight: 700; margin-bottom: 8px;">狼人</h3>
+                <span class="role-badge role-werewolf">WEREWOLF</span>
+                <p style="color: #cbd5e1; font-size: 0.9rem; margin-top: 12px;">每晚选择一个村民进行淘汰</p>
+            </div>
+            <!-- 村民 -->
+            <div class="role-card">
+                <div class="role-avatar" style="background: rgba(34, 197, 94, 0.2); border-color: #22c55e;">🧑‍🌾</div>
+                <h3 style="font-weight: 700; margin-bottom: 8px;">村民</h3>
+                <span class="role-badge role-villager">VILLAGER</span>
+                <p style="color: #cbd5e1; font-size: 0.9rem; margin-top: 12px;">发现并投票淘汰所有狼人</p>
+            </div>
+            <!-- 先知 -->
+            <div class="role-card">
+                <div class="role-avatar" style="background: rgba(59, 130, 246, 0.2); border-color: #3b82f6;">🔮</div>
+                <h3 style="font-weight: 700; margin-bottom: 8px;">先知</h3>
+                <span class="role-badge role-seer">SEER</span>
+                <p style="color: #cbd5e1; font-size: 0.9rem; margin-top: 12px;">每晚可查看一个玩家的身份</p>
+            </div>
+            <!-- 医生 -->
+            <div class="role-card">
+                <div class="role-avatar" style="background: rgba(168, 85, 247, 0.2); border-color: #a855f7;">⚕️</div>
+                <h3 style="font-weight: 700; margin-bottom: 8px;">医生</h3>
+                <span class="role-badge role-doctor">DOCTOR</span>
+                <p style="color: #cbd5e1; font-size: 0.9rem; margin-top: 12px;">每晚保护一个玩家免受淘汰</p>
+            </div>
+            <!-- 猎人 -->
+            <div class="role-card">
+                <div class="role-avatar" style="background: rgba(245, 158, 11, 0.2); border-color: #f59e0b;">🏹</div>
+                <h3 style="font-weight: 700; margin-bottom: 8px;">猎人</h3>
+                <span class="role-badge role-hunter">HUNTER</span>
+                <p style="color: #cbd5e1; font-size: 0.9rem; margin-top: 12px;">被淘汰时可带走一个玩家</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 游戏截图 -->
+    <section class="screenshots">
+        <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 20px;">
+            <span style="background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">游戏界面预览</span>
+        </h2>
+        <div class="screenshot-grid">
+            <!-- 登录页面 -->
+            <div class="screenshot-item">
+                <div class="mock-screen">
+                    <div style="text-align: center; width: 100%;">
+                        <div style="font-size: 2.5rem; margin-bottom: 20px;">🐺</div>
+                        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 10px;">狼人杀</h3>
+                        <p style="color: #cbd5e1; margin-bottom: 30px;">策略推理多人游戏</p>
+                        <input type="email" placeholder="邮箱" class="input-field" style="margin-bottom: 15px;">
+                        <input type="password" placeholder="密码" class="input-field" style="margin-bottom: 20px;">
+                        <button class="btn-primary" style="width: 100%;">登 录</button>
+                    </div>
+                </div>
+                <p style="padding: 15px; text-align: center; color: #cbd5e1;">登录/注册页面</p>
+            </div>
+
+            <!-- 游戏大厅 -->
+            <div class="screenshot-item">
+                <div class="mock-screen" style="flex-direction: column;">
+                    <h3 style="width: 100%; text-align: left; font-weight: 700; margin-bottom: 20px;">🏛️ 游戏大厅</h3>
+                    <div style="width: 100%; space-y: 3;">
+                        <div style="background: rgba(168, 85, 247, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 10px;">
+                            <div style="font-weight: 600; margin-bottom: 5px;">欢乐狼人杀</div>
+                            <div style="font-size: 0.85rem; color: #cbd5e1;">👥 5/12 玩家</div>
+                        </div>
+                        <div style="background: rgba(168, 85, 247, 0.1); padding: 12px; border-radius: 8px;">
+                            <div style="font-weight: 600; margin-bottom: 5px;">紧张对战房</div>
+                            <div style="font-size: 0.85rem; color: #cbd5e1;">👥 8/10 玩家</div>
+                        </div>
+                    </div>
+                </div>
+                <p style="padding: 15px; text-align: center; color: #cbd5e1;">房间列表</p>
+            </div>
+
+            <!-- 游戏进行中 -->
+            <div class="screenshot-item">
+                <div class="mock-screen" style="flex-direction: column;">
+                    <h3 style="width: 100%; text-align: left; font-weight: 700; margin-bottom: 20px;">⚔️ 游戏进行中</h3>
+                    <div style="width: 100%;">
+                        <div style="background: rgba(168, 85, 247, 0.2); padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+                            <div style="color: #cbd5e1; font-size: 0.9rem;">当前阶段</div>
+                            <div style="font-size: 1.3rem; font-weight: 700; color: #a855f7;">☀️ 白天</div>
+                        </div>
+                        <div style="font-size: 0.9rem; color: #cbd5e1; text-align: center;">
+                            👥 9 位活跃玩家<br>
+                            🗳️ 正在进行投票
+                        </div>
+                    </div>
+                </div>
+                <p style="padding: 15px; text-align: center; color: #cbd5e1;">游戏进行中</p>
+            </div>
+
+            <!-- 游戏结果 -->
+            <div class="screenshot-item">
+                <div class="mock-screen" style="flex-direction: column;">
+                    <h3 style="width: 100%; text-align: left; font-weight: 700; margin-bottom: 20px;">🏆 游戏结束</h3>
+                    <div style="width: 100%; text-align: center;">
+                        <div style="font-size: 1.2rem; font-weight: 700; color: #86efac; margin-bottom: 15px;">村民阵营胜利！</div>
+                        <div style="background: rgba(34, 197, 94, 0.2); padding: 10px; border-radius: 8px; font-size: 0.9rem; color: #86efac;">
+                            📊 4 场游戏 | 🏅 3 胜 | 📈 75% 胜率
+                        </div>
+                    </div>
+                </div>
+                <p style="padding: 15px; text-align: center; color: #cbd5e1;">游戏结果</p>
+            </div>
+
+            <!-- 聊天界面 -->
+            <div class="screenshot-item">
+                <div class="mock-screen" style="flex-direction: column;">
+                    <h3 style="width: 100%; text-align: left; font-weight: 700; margin-bottom: 15px;">💬 实时聊天</h3>
+                    <div style="flex: 1; overflow-y: auto; margin-bottom: 15px; font-size: 0.85rem;">
+                        <div style="margin-bottom: 10px;">
+                            <div style="color: #a855f7; font-weight: 600;">玩家1</div>
+                            <div style="color: #cbd5e1;">我觉得他是狼人</div>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <div style="color: #a855f7; font-weight: 600;">玩家2</div>
+                            <div style="color: #cbd5e1;">我来提供线索...</div>
+                        </div>
+                    </div>
+                    <input type="text" placeholder="输入消息..." class="input-field" style="font-size: 0.85rem;">
+                </div>
+                <p style="padding: 15px; text-align: center; color: #cbd5e1;">聊天系统</p>
+            </div>
+
+            <!-- 排行榜 -->
+            <div class="screenshot-item">
+                <div class="mock-screen" style="flex-direction: column;">
+                    <h3 style="width: 100%; text-align: left; font-weight: 700; margin-bottom: 20px;">🏅 排行榜</h3>
+                    <div style="width: 100%; font-size: 0.85rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(168, 85, 247, 0.2);">
+                            <span style="color: #fcd34d; font-weight: 700;">🥇 TopPlayer</span>
+                            <span style="color: #fcd34d;">82%</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(168, 85, 247, 0.2);">
+                            <span style="color: #c0c0c0; font-weight: 700;">🥈 ProPlayer</span>
+                            <span style="color: #c0c0c0;">78%</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #cd7f32; font-weight: 700;">🥉 GoodPlayer</span>
+                            <span style="color: #cd7f32;">75%</span>
+                        </div>
+                    </div>
+                </div>
+                <p style="padding: 15px; text-align: center; color: #cbd5e1;">全球排行榜</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 技术栈 -->
+    <section style="max-width: 1200px; margin: 80px auto; padding: 0 20px;">
+        <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 50px;">
+            <span style="background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">技术栈</span>
+        </h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+            <div class="card" style="padding: 30px;">
+                <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 20px;">🎨 前端技术</h3>
+                <ul style="list-style: none;">
+                    <li style="margin-bottom: 10px;">✅ React 18</li>
+                    <li style="margin-bottom: 10px;">✅ Tailwind CSS</li>
+                    <li style="margin-bottom: 10px;">✅ Socket.io Client</li>
+                    <li style="margin-bottom: 10px;">✅ Zustand 状态管理</li>
+                    <li style="margin-bottom: 10px;">✅ React Router v6</li>
+                    <li>✅ Axios HTTP客户端</li>
+                </ul>
+            </div>
+            <div class="card" style="padding: 30px;">
+                <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 20px;">⚙️ 后端技术</h3>
+                <ul style="list-style: none;">
+                    <li style="margin-bottom: 10px;">✅ Node.js + Express</li>
+                    <li style="margin-bottom: 10px;">✅ Socket.io 实时通信</li>
+                    <li style="margin-bottom: 10px;">✅ MongoDB + Mongoose</li>
+                    <li style="margin-bottom: 10px;">✅ JWT 认证</li>
+                    <li style="margin-bottom: 10px;">✅ Bcrypt 密码加密</li>
+                    <li>✅ CORS 跨域处理</li>
+                </ul>
+            </div>
+            <div class="card" style="padding: 30px;">
+                <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 20px;">🚀 功能特性</h3>
+                <ul style="list-style: none;">
+                    <li style="margin-bottom: 10px;">✅ 用户注册登录</li>
+                    <li style="margin-bottom: 10px;">✅ 房间创建和管理</li>
+                    <li style="margin-bottom: 10px;">✅ 完整游戏逻辑</li>
+                    <li style="margin-bottom: 10px;">✅ 实时多人交互</li>
+                    <li style="margin-bottom: 10px;">✅ 数据统计排行榜</li>
+                    <li>✅ 响应式设计</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section style="max-width: 1000px; margin: 80px auto; padding: 60px 20px; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 16px; text-align: center;">
+        <h2 style="font-size: 2rem; font-weight: 900; margin-bottom: 20px;">准备好了吗？</h2>
+        <p style="color: #cbd5e1; margin-bottom: 30px; font-size: 1.1rem;">加入数千名玩家，开启精彩的狼人杀之旅</p>
+        <button class="btn-primary" style="font-size: 1.1rem; padding: 15px 40px;">现在就玩</button>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+        <p style="margin-bottom: 10px;">🐺 狼人杀网页游戏 © 2026</p>
+        <p style="font-size: 0.9rem; color: #94a3b8;">采用日式二次元美学 | 实时多人在线 | 策略推理游戏</p>
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(168, 85, 247, 0.2);">
+            <p style="font-size: 0.85rem; color: #64748b;">
+                <a href="#" style="color: #a855f7; text-decoration: none;">GitHub</a> • 
+                <a href="#" style="color: #a855f7; text-decoration: none;">文档</a> • 
+                <a href="#" style="color: #a855f7; text-decoration: none;">关于我们</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 添加平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+            });
+        });
+
+        // 按钮交互
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
